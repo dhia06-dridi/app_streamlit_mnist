@@ -1,4 +1,3 @@
-Here's a simple README file for your Streamlit app:
 
 ---
 
