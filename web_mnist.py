@@ -6,7 +6,7 @@ from tensorflow.keras.models import load_model
 import os
 
 # Path to the model
-model_path = r"C:\Users\dhiad\OneDrive - Ministere de l'Enseignement Superieur et de la Recherche Scientifique\project_dhia\projet\raia_2\ad_dl\CNN_MNIST\streamlit_app_mnist\mnist_cnn_model.keras"
+model_path = "mnist_cnn_model.keras"
 
 # Loading the model
 try:
