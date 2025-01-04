@@ -66,3 +66,7 @@ This Streamlit application allows users to draw digits on a canvas, which are th
 - PIL (Pillow)
 
 ---
+
+
+
+![Untitled video - Made with Clipchamp](https://github.com/user-attachments/assets/e0e244ab-8bf7-4801-913c-f9de7c104f41)
