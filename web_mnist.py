@@ -1,13 +1,13 @@
+
 import streamlit as st
+from streamlit_drawable_canvas import st_canvas
 from PIL import Image
 import numpy as np
 from tensorflow.keras.models import load_model
-import matplotlib.pyplot as plt
-from matplotlib.widgets import Button
+import os
 
 # Path to the model
 model_path = "https://github.com/dhia06-dridi/app_streamlit_mnist/raw/main/mnist_cnn_model.keras"
-
 # Loading the model
 try:
     cnn_model = load_model(model_path)
@@ -15,7 +15,9 @@ try:
 except Exception as e:
     st.error(f"Error loading the model: {e}")
 
-# Dimensions for images
+# Dimensions for canvas and images
+CANVAS_WIDTH = 200
+CANVAS_HEIGHT = 200
 IMG_SIZE = 28  # Target size for the model (28x28)
 
 # Function to predict the image
@@ -31,46 +33,34 @@ def predict_image(image):
 # Streamlit application
 st.title("Draw a Digit")
 
-# Drawing with Matplotlib
-fig, ax = plt.subplots(figsize=(4, 4))
-canvas = np.zeros((IMG_SIZE, IMG_SIZE), dtype=np.uint8)
+# Using st_canvas to draw
+canvas_result = st_canvas(
+    fill_color="black",  # Fill color of the background
+    stroke_width=10,     # Brush width
+    stroke_color="white", # Brush color
+    background_color="black",  # Background color
+    height=CANVAS_HEIGHT,
+    width=CANVAS_WIDTH,
+    drawing_mode="freedraw",  # Free drawing mode
+    key="canvas",
+)
 
-# Display the blank canvas
-im = ax.imshow(canvas, cmap='gray', vmin=0, vmax=255)
-ax.set_axis_off()
+# Check if the user has drawn
+if canvas_result.image_data is not None:
+    # Convert drawing to a PIL image
+    image_array = (canvas_result.image_data[:, :, 0]).astype("uint8")  # Keep the image as is
+    image = Image.fromarray(image_array)
 
-# Function to draw on the canvas
-def draw(event):
-    global canvas, im
-    if event.inaxes:
-        x, y = int(event.xdata), int(event.ydata)
-        if 0 <= x < IMG_SIZE and 0 <= y < IMG_SIZE:
-            canvas[y, x] = 255
-            im.set_data(canvas)
-            fig.canvas.draw()
+    # Display the drawn image
+    st.image(image, caption="Drawn Image", use_column_width=True)
 
-# Button for clearing the canvas
-def clear_canvas(event):
-    global canvas
-    canvas = np.zeros((IMG_SIZE, IMG_SIZE), dtype=np.uint8)
-    im.set_data(canvas)
-    fig.canvas.draw()
+    # Predict if the button is clicked
+    if st.button("Predict"):
+        try:
+            predicted_class, confidence = predict_image(image)
+            st.write(f"Predicted Class: {predicted_class}")
+            st.write(f"Confidence: {confidence:.2f}%")
+        except Exception as e:
+            st.error(f"Error during prediction: {e}")
 
-clear_button = Button(plt.axes([0.8, 0.01, 0.1, 0.05]), 'Clear')
-clear_button.on_clicked(clear_canvas)
-
-# Connect the draw function to mouse click event
-fig.canvas.mpl_connect('button_press_event', draw)
-
-# Display the canvas
-st.pyplot(fig)
-
-# Predict if the button is clicked
-if st.button("Predict"):
-    try:
-        image = Image.fromarray(canvas)
-        predicted_class, confidence = predict_image(image)
-        st.write(f"Predicted Class: {predicted_class}")
-        st.write(f"Confidence: {confidence:.2f}%")
-    except Exception as e:
-        st.error(f"Error during prediction: {e}")
+        
