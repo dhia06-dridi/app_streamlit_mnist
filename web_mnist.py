@@ -6,8 +6,7 @@ from tensorflow.keras.models import load_model
 import os
 
 # Path to the model
-model_path = "mnist_cnn_model.keras"
-
+model_path = "https://github.com/dhia06-dridi/app_streamlit_mnist/raw/main/mnist_cnn_model.keras"
 # Loading the model
 try:
     cnn_model = load_model(model_path)
